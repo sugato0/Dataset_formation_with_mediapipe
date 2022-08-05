@@ -40,7 +40,7 @@ class HandDetector:
 
                 for id, lm in enumerate(handLms.landmark):
                     px, py, pz = int(lm.x * w), int(lm.y * h), int(lm.z * w)
-                    mylmList.append([px, py, pz])
+                    mylmList.append([px, py])
 
                 myHand["lmList"] = mylmList
 
@@ -61,8 +61,18 @@ class HandDetector:
         else:
             return allHands
 
+def shuffle_in_unison(a, b):
+    assert len(a) == len(b)
+    shuffled_a = list()
+    shuffled_b = list()
+    permutation = np.random.permutation(len(a))
+    for old_index, new_index in enumerate(permutation):
+        shuffled_a.append(a[old_index])
+        shuffled_b.append(b[old_index])
 
+    return np.array(shuffled_a), np.array(shuffled_b)
 def main():
+    #our dataset
     image_list = glob.glob("D:/data_sign_language_numbers/Sign-Language-Digits-Dataset-master/Dataset/*/*.jpg")
     detector = HandDetector(detectionCon=0.8, maxHands=2)
 
@@ -72,14 +82,6 @@ def main():
     keys = -1
     for i in image_list:
         # Get image frame
-
-
-
-
-
-
-
-
 
         image = cv2.imread(i)
 
@@ -91,15 +93,19 @@ def main():
 
 
             lmList1 = hand1["lmList"]
+
             if counter % 205 == 0:
                 keys+=1
             counter+=1
             print(keys,lmList1)
             X.append(lmList1)
             y.append(keys)
+    X,y = shuffle_in_unison(X,y)
+    print(X)
+    print(y)
 
-    np.savez("X.npz", X)
-    np.savez("y.npz", y)
+    np.savez("../SignLanguage_numbersIteration/X.npz", np.array(X))
+    np.savez("../SignLanguage_numbersIteration/y.npz", np.array(y))
 
 
 if __name__ == "__main__":
