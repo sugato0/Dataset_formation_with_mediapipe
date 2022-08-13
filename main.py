@@ -73,10 +73,13 @@ def shuffle_in_unison(a, b):
     return np.array(shuffled_a), np.array(shuffled_b)
 def main():
     #our dataset
-    image_list = glob.glob("D:/data_sign_language_numbers/Sign-Language-Digits-Dataset-master/Dataset/*/*.jpg")
+    image_list = glob.glob("D:/Data_for_sign_language/Static/Alphabet/*/*.jpg")
     detector = HandDetector(detectionCon=0.8, maxHands=2)
-
+    print(image_list)
     X = []
+    y_classes = ["a","b","c","ch","e","f","g","i","ie","l","m",
+                 "n","o","p","r","sz","t","th","u","v","x",
+                 "y","ya"]
     y = []
     counter = 0
     keys = -1
@@ -84,28 +87,32 @@ def main():
         # Get image frame
 
         image = cv2.imread(i)
+        image = cv2.resize(image,(100,100))
 
         hands, img = detector.findHands(image)
 
+        print(hands)
         if hands:
             # Hand 1
             hand1 = hands[0]
-
+            print(hand1)
 
             lmList1 = hand1["lmList"]
-
-            if counter % 205 == 0:
+            #count of every class
+            if counter % 204 == 0:
                 keys+=1
             counter+=1
             print(keys,lmList1)
             X.append(lmList1)
-            y.append(keys)
+            y.append(y_classes[keys])
+        else:
+            counter+=1
     X,y = shuffle_in_unison(X,y)
     print(X)
     print(y)
 
-    np.savez("../SignLanguage_numbersIteration/X.npz", np.array(X))
-    np.savez("../SignLanguage_numbersIteration/y.npz", np.array(y))
+    np.savez("C:/Users/sahar/PycharmProjects/SignLanguage_AlphabetIteration/X.npz", np.array(X))
+    np.savez("C:/Users/sahar/PycharmProjects/SignLanguage_AlphabetIteration/y.npz", np.array(y))
 
 
 if __name__ == "__main__":
